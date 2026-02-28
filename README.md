@@ -84,7 +84,7 @@ Her veri seti için aynı pipeline uygulandı: %80 train / %20 test, `random_sta
 1. **En iyi metrik** Z-Score yönteminde elde edildi (R²: 0.89)
 2. **En iyi RMSE** IQR yönteminde elde edildi (%14.5 iyileşme)
 3. **Winsorization** veri kaybetmeden iyileştirme sağladı ancak en düşük etki burada görüldü
-4. **Residual analizi** önemli bir ödünleşim ortaya koydu: aykırı değer temizliği metrikleri iyileştirirken residual dağılımında sistematik sapmalara yol açtı. Bu durum, aykırı değerlerin her zaman gürültü olmadığını; bazen gerçek dünya varyasyonunu temsil edebileceğini göstermektedir
+4. **Residual analizi** önemli bir etki ortaya koydu: aykırı değer temizliği metrikleri iyileştirirken residual dağılımında sistematik sapmalara yol açtı. Bu durum, aykırı değerlerin her zaman gürültü olmadığını; bazen gerçek dünya varyasyonunu temsil edebileceğini göstermektedir
 
 ---
 
