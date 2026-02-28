@@ -1,4 +1,4 @@
-> **EN:** A comparative study analyzing the impact of four outlier treatment methods (None, IQR Removal, Winsorization, Z-Score) on Linear Regression model performance using a food delivery dataset.
+> > **EN:** A comparative study analyzing the impact of four outlier treatment methods (None, IQR Removal, Winsorization, Z-Score) on Linear Regression model performance using a food delivery dataset.
 
 ---
 
@@ -72,10 +72,10 @@ Her veri seti için aynı pipeline uygulandı: %80 train / %20 test, `random_sta
 
 | Model | Residual Ortalaması | Yorum |
 |---|---|---|
-| Base Model | -0.48 | 0'a en yakın — varsayımlar en sağlıklı |
+| Winsorization | +0.20 | 0'a en yakın — en dengeli |
+| Z-Score Removal | -0.34 | İkinci en dengeli |
+| Base Model | -0.48 | Kabul edilebilir |
 | IQR Removal | -0.99 | Sistematik negatif sapma |
-| Winsorization | +0.20 | Hafif pozitif sapma |
-| Z-Score Removal | -0.34 | Base'den sonra en dengeli |
 
 ---
 
@@ -84,7 +84,7 @@ Her veri seti için aynı pipeline uygulandı: %80 train / %20 test, `random_sta
 1. **En iyi metrik** Z-Score yönteminde elde edildi (R²: 0.89)
 2. **En iyi RMSE** IQR yönteminde elde edildi (%14.5 iyileşme)
 3. **Winsorization** veri kaybetmeden iyileştirme sağladı ancak en düşük etki burada görüldü
-4. **Residual analizi** önemli bir trade-off ortaya koydu: aykırı değer temizliği metrikleri iyileştirirken residual dağılımında sistematik sapmalara yol açtı. Bu durum, aykırı değerlerin her zaman gürültü olmadığını; bazen gerçek dünya varyasyonunu temsil edebileceğini göstermektedir
+4. **Residual analizi** önemli bir ödünleşim ortaya koydu: aykırı değer temizliği metrikleri iyileştirirken residual dağılımında sistematik sapmalara yol açtı. Bu durum, aykırı değerlerin her zaman gürültü olmadığını; bazen gerçek dünya varyasyonunu temsil edebileceğini göstermektedir
 
 ---
 
