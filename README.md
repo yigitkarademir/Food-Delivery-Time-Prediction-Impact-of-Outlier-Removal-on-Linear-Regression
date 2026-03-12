@@ -1,4 +1,4 @@
-> > **EN:** A comparative study analyzing the impact of four outlier treatment methods (None, IQR Removal, Winsorization, Z-Score) on Linear Regression model performance using a food delivery dataset.
+> **EN:** A comparative study analyzing the impact of four outlier treatment methods (None, IQR Removal, Winsorization, Z-Score) on Linear Regression model performance using a food delivery dataset.
 
 ---
 
@@ -34,7 +34,7 @@ Kaggle üzerinden temin edilen **Food Delivery Time Estimation** veri seti kulla
 ### 1. Keşifsel Veri Analizi
 - Mesafe ile teslimat süresi arasındaki ilişki saçılım grafiğiyle incelendi
 - Korelasyon matrisiyle değişkenler arası ilişki ölçüldü (distance_km: 0.75, rider_speed: -0.45)
-- Aykırı değerler kutu grafikleriyle tespit edildi
+- Aykırı değerler kutu grafikleriyle tespit edildi; `delivery_time` değişkeninde sağ kuyrukta birkaç aykırı gözlem belirlendi
 
 ### 2. Ön İşleme
 - `order_id` sütunu kaldırıldı
@@ -43,17 +43,17 @@ Kaggle üzerinden temin edilen **Food Delivery Time Estimation** veri seti kulla
 - Data leakage önlemek için scaler yalnızca train setine fit edildi
 
 ### 3. Aykırı Değer Yöntemleri
-Dört farklı yaklaşım `delivery_time` değişkenine uygulanarak karşılaştırıldı:
+Dört farklı yaklaşım yalnızca eğitim setindeki `delivery_time` değişkenine uygulanarak karşılaştırıldı:
 
 | Yöntem | Açıklama | Veri Kaybı |
 |---|---|---|
 | Base Model | Aykırı değer işlemi yapılmadı | — |
-| IQR Removal | 1.5×IQR sınırları dışındaki satırlar silindi | 8 satır |
+| IQR Removal | 1.5×IQR sınırları dışındaki satırlar silindi | 7 satır |
 | Winsorization | %5–%95 dışındaki değerler sınıra çekildi | 0 satır |
 | Z-Score Removal | \|z\| > 3 olan satırlar silindi | 5 satır |
 
 ### 4. Model Eğitimi
-Her veri seti için aynı pipeline uygulandı: %80 train / %20 test, `random_state=42`.
+Her veri seti için aynı pipeline uygulandı: %80 train / %20 test, `random_state=42`. Test seti tüm modeller için sabit tutuldu.
 
 ---
 
@@ -61,30 +61,34 @@ Her veri seti için aynı pipeline uygulandı: %80 train / %20 test, `random_sta
 
 ### Model Karşılaştırması
 
-| Model | R² | RMSE | İyileşme |
+| Model | R² | RMSE | Base'e Göre Fark |
 |---|---|---|---|
-| Base Model | 0.8709 | 7.62 dk | — |
-| IQR Removal | 0.8833 | 6.52 dk | RMSE ↓ %14.5 |
-| Winsorization | 0.8661 | 7.31 dk | RMSE ↓ %4.1 |
-| Z-Score Removal | **0.8934** | 6.80 dk | RMSE ↓ %10.8 |
+| **Base Model** | **0.8709** | **7.62 dk** | — |
+| IQR Removal | 0.8695 | 7.66 dk | RMSE ↑ %0.5 |
+| Winsorization | 0.8666 | 7.75 dk | RMSE ↑ %1.6 |
+| Z-Score Removal | 0.8702 | 7.64 dk | RMSE ↑ %0.3 |
+
+> **Not:** Hiçbir aykırı değer yöntemi Base Model'i geçemedi. En iyi performans, herhangi bir müdahale yapılmayan orijinal veri setiyle elde edildi.
 
 ### Residual Analizi
 
-| Model | Residual Ortalaması | Yorum |
-|---|---|---|
-| Winsorization | +0.20 | 0'a en yakın — en dengeli |
-| Z-Score Removal | -0.34 | İkinci en dengeli |
-| Base Model | -0.48 | Kabul edilebilir |
-| IQR Removal | -0.99 | Sistematik negatif sapma |
+| Model | Residual Ortalaması | Std Dev | Yorum |
+|---|---|---|---|
+| Base Model | -0.48 | 7.65 | En düşük std dev — en tutarlı |
+| IQR Removal | +0.13 | 7.70 | Ortalama 0'a yakın ama std arttı |
+| Winsorization | +0.11 | 7.79 | En yüksek std dev |
+| Z-Score Removal | -0.07 | 7.68 | Ortalama 0'a en yakın |
 
 ---
 
 ## 🔑 Ana Çıkarımlar
 
-1. **En iyi metrik** Z-Score yönteminde elde edildi (R²: 0.89)
-2. **En iyi RMSE** IQR yönteminde elde edildi (%14.5 iyileşme)
-3. **Winsorization** veri kaybetmeden iyileştirme sağladı ancak en düşük etki burada görüldü
-4. **Residual analizi** önemli bir etki ortaya koydu: aykırı değer temizliği metrikleri iyileştirirken residual dağılımında sistematik sapmalara yol açtı. Bu durum, aykırı değerlerin her zaman gürültü olmadığını; bazen gerçek dünya varyasyonunu temsil edebileceğini göstermektedir
+1. **Base Model en iyi test performansını verdi.** Tüm aykırı değer yöntemleri RMSE'yi hafifçe kötüleştirdi. Bu bulgu, aykırı değer temizliğinin her durumda performansı artırmadığını somut olarak göstermektedir.
+
+2. **Aykırı değerler gerçek dünya varyasyonunu temsil edebilir.** Teslimat sürelerindeki yüksek değerler (örn. fırtınalı havalardaki gecikmeler) gerçek operasyonel senaryolara karşılık gelebilir. Bu değerleri silmek veya sınırlamak, modelin bu durumları öğrenmesini engelleyerek genelleme kapasitesini düşürmüş olabilir.
+
+3. **Z-Score yöntemi en az zarar veren alternatif oldu.** En az veri kaybıyla (5 satır) ve en düşük residual ortalamasıyla (-0.07) Base Model'e en yakın sonucu üretti.
+
 
 ---
 
